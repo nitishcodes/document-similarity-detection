@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Similarity Detection App</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Document Similarity Detection App</h1>
+        <form id="post-form" action="/" method="post" enctype="multipart/form-data">
+            <div class="file-input">
+                <label for="doc1">Choose a File</label>
+                <input type="file" id="doc1" name="doc1" accept=".txt ,.docx" onchange="displaySelectedFileName1()">
+                <span id="selectedFileName1">No file selected</span>
+            </div>
+            <div class="file-input">
+                <label for="doc2">Choose a File</label>
+                <input type="file" id="doc2" name="doc2" accept=".txt ,.docx" onchange="displaySelectedFileName2()">
+                <span id="selectedFileName2">No file selected</span>
+            </div>
+            <div class="select-container">
+                <label for="similarity-measure">Similarity Measure:</label>
+                <select id="similarity-measure" name="similarity-measure">
+                    <option value="1">Jaccard Similarity</option>
+                    <option value="2">Cosine Similarity</option>
+                    <option value="3">MinHash and LSH (Locality-Sensitive Hashing)</option>
+                    <option value="4">Longest Common Subsequence</option>
+                    <option value="5">Smith-Waterman Score</option>
+                    <option value="6">Needleman-Wunsch Score</option>
+                </select>
+            </div>
+            <button type="submit" class="calculate-btn">Calculate</button>
+        </form>
+        {% if message=="" %}
+
+        {% else %}
+        {% if message==0 %}
+        <div class="error">Please select any 2 documents for similarity comparison</div>
+        {% else %}
+        <div class="result">{{message}}</div>
+
+        {% endif %}
+        {% endif %}
+        {% if content=="" %}
+        <div class="content-display" style="display: none;">
+            {{content}}
+        </div>
+        {% else %}
+        <div class="content-display">
+            {{content}}
+        </div>
+        {% endif %}
+
+    </div>
+    <script>
+        function displaySelectedFileName1() {
+            const fileInput = document.getElementById('doc1');
+            const selectedFileName = document.getElementById('selectedFileName1');
+
+            if (fileInput.files.length > 0) {
+                selectedFileName.textContent = fileInput.files[0].name;
+            } else {
+                selectedFileName.textContent = 'No file selected';
+            }
+        }
+        function displaySelectedFileName2() {
+            const fileInput = document.getElementById('doc2');
+            const selectedFileName = document.getElementById('selectedFileName2');
+
+            if (fileInput.files.length > 0) {
+                selectedFileName.textContent = fileInput.files[0].name;
+            } else {
+                selectedFileName.textContent = 'No file selected';
+            }
+        }
+        function hideContentDivIfEmpty() {
+            const contentDiv = document.querySelector('.content-display');
+
+            if (contentDiv.textContent.trim() === '') {
+                contentDiv.style.display = 'none';
+            } else {
+                contentDiv.style.display = 'block';
+            }
+        }
+        hideContentDivIfEmpty();
+    </script>
+</body>
+
+</html>
