@@ -8,6 +8,7 @@ import nltk
 from datasketch import MinHash, MinHashLSH
 import torch
 from transformers import AutoModel, AutoTokenizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 UPLOAD_FOLDER = (
@@ -31,7 +32,7 @@ def jaccard_similarity(document1, document2):
     return [jaccard_similarity, content]
 
 
-def cosine_similarity(document1, document2):
+def cosine_similarity_score(document1, document2):
     vectorizer = sklearn.feature_extraction.text.TfidfVectorizer()
 
     vectorizer.fit([document1, document2])
@@ -146,28 +147,42 @@ def bert(document1, document2):
 
 
 def calculate_similarity(document1, document2, choice):
+    try:
+        with open(document1, "r") as file:
+            file_contents1 = file.read()
+    except FileNotFoundError:
+        print("File not found. Please check the file path.")
+    except Exception as e:
+        print("An error occurred:", str(e))
+    try:
+        with open(document2, "r") as file:
+            file_contents2 = file.read()
+    except FileNotFoundError:
+        print("File not found. Please check the file path.")
+    except Exception as e:
+        print("An error occurred:", str(e))
     if choice == "1":
-        similarity = jaccard_similarity(document1, document2)
+        similarity = jaccard_similarity(file_contents1, file_contents2)
         return ["Jaccard Similarity:" + str(similarity[0]), similarity[1]]
     elif choice == "2":
-        similarity = cosine_similarity(document1, document2)
+        similarity = cosine_similarity_score(file_contents1, file_contents2)
         return ["Cosine Similarity:" + str(similarity[0]), similarity[1]]
     elif choice == "3":
-        similarity = minhash_lsh_similarity(document1, document2)
+        similarity = minhash_lsh_similarity(file_contents1, file_contents2)
         return ["Minhash LSH Similarity Score:" + str(similarity[0]), similarity[1]]
     elif choice == "4":
-        similarity = longest_common_subsequence(document1, document2)
+        similarity = longest_common_subsequence(file_contents1, file_contents2)
 
         return ["Longest Common Subsequence:" + str(similarity[0]), similarity[1]]
     elif choice == "5":
-        similarity = smith_waterman(document1, document2)
+        similarity = smith_waterman(file_contents1, file_contents2)
         return ["Smith-Waterman Score:" + str(similarity[0]), similarity[1]]
     elif choice == "6":
-        similarity = needleman_wunsch(document1, document2)
+        similarity = needleman_wunsch(file_contents1, file_contents2)
         return ["Needleman-Wunsch Score:" + str(similarity[0]), similarity[1]]
     elif choice == "7":
-        similarity = bert(document1, document2)
-        return ["BERT Similarity:" + str(similarity[0]), similarity[1]]
+        similarity = bert(file_contents1, file_contents2)
+        return ["BERT Similarity:" + str(similarity[0][0][0]), similarity[1]]
 
 
 @app.route("/", methods=["POST", "GET"])
