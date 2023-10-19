@@ -6,6 +6,8 @@ import numpy as np
 import sklearn
 import nltk
 from datasketch import MinHash, MinHashLSH
+import torch
+from transformers import AutoModel, AutoTokenizer
 
 app = Flask(__name__)
 UPLOAD_FOLDER = (
@@ -126,6 +128,21 @@ def minhash_lsh_similarity(doc1, doc2, num_perm=128, threshold=0.5):
         return [minhash1.jaccard(minhash2), content]
     else:
         return "No similarity found."
+
+
+def bert(document1, document2):
+    model_name = "bert-base-uncased"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+
+    tokens1 = tokenizer(document1, return_tensors="pt", padding=True, truncation=True)
+    tokens2 = tokenizer(document2, return_tensors="pt", padding=True, truncation=True)
+
+    with torch.no_grad():
+        embeddings1 = model(**tokens1).last_hidden_state.mean(dim=1)
+        embeddings2 = model(**tokens2).last_hidden_state.mean(dim=1)
+    content = "The value obtained from BERT (Bidirectional Encoder Representations from Transformers) represents a similarity score that measures the semantic similarity between the contents of two documents. BERT calculates this score by analyzing the contextual understanding of words and their relationships in the documents. Higher BERT similarity scores indicate that the documents share more semantically related content, while lower scores suggest less similarity."
+    return [cosine_similarity(embeddings1, embeddings2), content]
 
 
 def calculate_similarity(document1, document2, choice):
