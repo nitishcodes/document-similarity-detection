@@ -165,6 +165,9 @@ def calculate_similarity(document1, document2, choice):
     elif choice == "6":
         similarity = needleman_wunsch(document1, document2)
         return ["Needleman-Wunsch Score:" + str(similarity[0]), similarity[1]]
+    elif choice == "7":
+        similarity = bert(document1, document2)
+        return ["BERT Similarity:" + str(similarity[0]), similarity[1]]
 
 
 @app.route("/", methods=["POST", "GET"])
