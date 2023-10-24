@@ -128,7 +128,7 @@ def minhash_lsh_similarity(doc1, doc2, num_perm=128, threshold=0.5):
     if result:
         return [minhash1.jaccard(minhash2), content]
     else:
-        return "No similarity found."
+        return [0, content]
 
 
 def bert(document1, document2):
@@ -172,7 +172,6 @@ def calculate_similarity(document1, document2, choice):
         return ["Minhash LSH Similarity Score:" + str(similarity[0]), similarity[1]]
     elif choice == "4":
         similarity = longest_common_subsequence(file_contents1, file_contents2)
-
         return ["Longest Common Subsequence:" + str(similarity[0]), similarity[1]]
     elif choice == "5":
         similarity = smith_waterman(file_contents1, file_contents2)
